@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&amp;family=Inter+Tight:wght@400..700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#f6f7f9}
+a{color:#00a693;text-decoration:none}a:hover{color:#1fa96b}
+*{box-sizing:border-box}
+::-webkit-scrollbar{display:none}
+@keyframes alertIn{0%{opacity:0;transform:translateY(-16px) scale(.97)}60%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(0,166,147,.22)}50%{box-shadow:0 0 20px 2px rgba(0,166,147,.16)}}
+@keyframes blink{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes sheetIn{from{transform:translateY(100%)}to{transform:none}}
+@keyframes scrimIn{from{opacity:0}to{opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:grid;place-items:center;padding:28px;background:radial-gradient(1200px 800px at 50% 0%, #ffffff 0%, #eef1f5 60%)">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ false }}" hint-size="430px,920px">
+<div style="position:relative;height:100%;display:flex;flex-direction:column;background:radial-gradient(120% 90% at 50% 0%,#ffffff 0%,#f3f5f8 60%);color:#1c2434;font-family:'Inter Tight',system-ui,sans-serif;overflow:hidden;padding-top:58px">
+
+  <!-- ======================== SPLASH ======================== -->
+  <sc-if value="{{ isSplash }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;display:flex;flex-direction:column;padding:24px 22px 34px;animation:fadeUp .5s ease both">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:26px">
+      <div style="text-align:center">
+        <img src="myant-logo.png" alt="Myant" style="height:26px;margin-bottom:14px;filter:invert(1) opacity(.92) drop-shadow(0 0 18px rgba(0,166,147,.25))">
+        <div style="font-family: JetBrains Mono; font-size: 34px; font-weight: 400; letter-spacing: -.01em">Connect</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.22em;color:#8a93a6;margin-top:8px">FIVE SENSORS · ONE INTELLIGENCE</div>
+      </div>
+      <sc-if value="{{ hasVideo }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;border-radius:20px;overflow:hidden;aspect-ratio:9/12;box-shadow:0 24px 60px rgba(16,24,40,.18),0 0 0 1px #e3e7ee">
+          <video ref="{{ videoElRef }}" src="{{ videoUrl }}" loop="{{ true }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000"></video>
+          <button onClick="{{ pickVideo }}" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,.85);border:1px solid #cfd7e2;border-radius:999px;color:#6a7386;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;padding:5px 10px;cursor:pointer">REPLACE</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noVideo }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ pickVideo }}" style="border:1px dashed #cfd7e2;border-radius:20px;aspect-ratio:9/12;display:grid;place-items:center;background:repeating-linear-gradient(135deg,#f1f3f7 0px,#f1f3f7 12px,#e9edf3 12px,#e9edf3 24px);cursor:pointer;color:inherit;width:100%;transition:border-color .2s" style-hover="border-color:rgba(0,166,147,.5)">
+          <div style="text-align:center">
+            <div style="width:52px;height:52px;border-radius:50%;border:1px solid #cfd7e2;display:grid;place-items:center;margin:0 auto 12px;color:#00a693;font-size:16px;background:rgba(0,166,147,.05)">▶</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:#6a7386">AI VIDEO</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8a93a6;margin-top:5px">tap to add a video file</div>
+          </div>
+        </button>
+      </sc-if>
+      <input ref="{{ videoInputRef }}" type="file" accept="video/*" onChange="{{ onVideoFile }}" style="display:none">
+    </div>
+    <button onClick="{{ enterApp }}" style="width:100%;background:linear-gradient(135deg,#00a693,#008f7e);border:none;border-radius:14px;padding:15px;color:#f6f7f9;font-family:'Inter Tight',sans-serif;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 0 28px rgba(0,166,147,.22);margin-top:20px">Enter Myant Connect</button>
+  </div>
+  </sc-if>
+
+  <!-- ======================== TODAY ======================== -->
+  <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1;overflow-y:auto;padding:14px 18px 24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <img src="myant-logo.png" alt="Myant" style="height:16px;filter:invert(1) opacity(.9)">
+      <button onClick="{{ restart }}" title="Restart demo" style="background:none;border:1px solid #e5e9f0;border-radius:999px;color:#8a93a6;font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer">RESTART ⟲</button>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6a7386;margin-bottom:6px">{{ todayDate }}</div>
+    <div style="font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:400;letter-spacing:-.01em;margin-bottom:18px">Morning, Ms. Hale</div>
+
+    <sc-if value="{{ alertFired }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ openCatch }}" style="display:block;width:100%;text-align:left;cursor:pointer;background:linear-gradient(180deg,#fff8eb,#fdf1da);border:1px solid rgba(217,141,16,.45);border-radius:16px;padding:16px;margin-bottom:16px;color:#1c2434;animation:alertIn .55s cubic-bezier(.2,.9,.3,1) both;box-shadow:0 0 24px rgba(217,141,16,.10)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+          <span style="width:8px;height:8px;border-radius:50%;background:#d98d10;box-shadow:0 0 8px #d98d10;animation:blink 1.8s infinite"></span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#d98d10">DARWIN · NEW FINDING · COMET</span>
+        </div>
+        <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:16.5px;line-height:1.45;color:#6e5310">"I've connected three signals across sensors on Comet. Individually they're within range. Together they're a pattern worth catching early."</div>
+        <div style="margin-top:10px;font-size:13px;color:#d98d10;font-weight:600">See what I found →</div>
+      </button>
+    </sc-if>
+
+    <div style="background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid #e5e9f0;border-radius:18px;box-shadow:0 12px 28px rgba(16,24,40,.06);padding:16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="width:8px;height:8px;border-radius:50%;background:{{ stringDot }};box-shadow:0 0 8px {{ stringDot }}"></span>
+        <span style="font-size:14px;font-weight:600">{{ stringLine }}</span>
+      </div>
+      <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:14.5px;line-height:1.5;color:#525c70">{{ morningRead }}</div>
+    </div>
+
+    <div style="display:flex;gap:10px;overflow-x:auto;margin:0 -18px 14px;padding:2px 18px 6px">
+      <sc-for list="{{ horses }}" as="h" hint-placeholder-count="5">
+        <button onClick="{{ h.tap }}" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid #e5e9f0;border-radius:16px;box-shadow:0 10px 24px rgba(16,24,40,.06);padding:12px 14px;cursor:pointer;color:#1c2434;min-width:86px;transition:border-color .18s,transform .18s" style-hover="border-color:#b3bdcf;transform:translateY(-1px)">
+          <div style="position:relative">
+            <div style="width:46px;height:46px;border-radius:50%;overflow:hidden;border:1px solid #dbe1ea">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="photo-{{ h.id }}" shape="circle" fit="cover" placeholder="{{ h.initials }}" hint-size="46px,46px" style="width:46px;height:46px;display:block"></x-import>
+            </div>
+            <span style="position:absolute;bottom:0;right:-1px;width:9px;height:9px;border-radius:50%;background:{{ h.dot }};border:2px solid #ffffff"></span>
+          </div>
+          <div style="font-size:12.5px;font-weight:600">{{ h.name }}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.08em;color:#8a93a6">{{ h.tag }}</div>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid #e5e9f0;border-radius:18px;box-shadow:0 12px 28px rgba(16,24,40,.06);padding:18px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6a7386;margin-bottom:6px">VITALITY · COMET</div>
+        <div style="font-size:12.5px;color:#6a7386">7-day trend {{ vitDelta }}</div>
+        <div style="font-size:12.5px;color:#8a93a6;margin-top:2px">Rest · SME · ME · R1 · R2 captured</div>
+      </div>
+      <div style="position:relative;width:96px;height:96px;flex:0 0 auto">
+        <svg viewBox="0 0 96 96" style="position:absolute;inset:0;width:100%;height:100%"><circle cx="48" cy="48" r="42" fill="none" stroke="#e8ecf2" stroke-width="5"></circle><circle cx="48" cy="48" r="42" fill="none" stroke="{{ vitColor }}" stroke-width="5" stroke-linecap="round" stroke-dasharray="{{ vitDash }}" transform="rotate(-90 48 48)" style="filter:drop-shadow(0 0 6px {{ vitGlow }})"></circle></svg>
+        <div style="position:absolute;inset:0;display:grid;place-items:center;font-family:'Fraunces',Georgia,serif;font-size:36px;font-weight:300;color:{{ vitColor }}">{{ vitScore }}</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ showSync }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ onSync }}" style="width:100%;background:rgba(0,166,147,.07);border:1px solid rgba(0,166,147,.4);border-radius:14px;padding:14px;color:#00a693;font-family:'Inter Tight',sans-serif;font-size:14px;font-weight:600;cursor:pointer;animation:glow 3s infinite">{{ syncLabel }}</button>
+    </sc-if>
+    <sc-if value="{{ alertFired }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8a93a6">SYNCED · 07:42 · 9 GARMENTS LIVE</div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <!-- ======================== HORSE ======================== -->
+  <sc-if value="{{ isHorse }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;overflow-y:auto;padding:14px 18px 24px">
+    <div style="display:flex;gap:8px;overflow-x:auto;margin:0 -18px 16px;padding:2px 18px">
+      <sc-for list="{{ horseChips }}" as="c" hint-placeholder-count="4">
+        <button onClick="{{ c.tap }}" style="flex:0 0 auto;background:{{ c.bg }};border:1px solid {{ c.border }};border-radius:999px;padding:7px 14px;color:{{ c.color }};font-size:12.5px;font-weight:600;cursor:pointer">{{ c.name }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+      <div style="width:62px;height:62px;border-radius:50%;overflow:hidden;border:1px solid #dbe1ea;flex:0 0 auto">
+        <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="photo-{{ horseId }}" shape="circle" fit="cover" placeholder="photo" hint-size="62px,62px" style="width:62px;height:62px;display:block"></x-import>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Fraunces',Georgia,serif;font-size:31px;font-weight:400;line-height:1.1">{{ horseName }}</div>
+        <div style="font-size:13px;color:#6a7386;margin-top:3px">{{ horseMeta }}</div>
+      </div>
+      <span style="font-family:'Fraunces',Georgia,serif;font-size:28px;color:{{ horseVitColor }}">{{ horseVit }}</span>
+    </div>
+    <div style="display:inline-flex;align-items:center;gap:7px;background:#ffffff;border:1px solid #e5e9f0;border-radius:999px;padding:6px 12px;margin-bottom:16px">
+      <span style="width:7px;height:7px;border-radius:50%;background:#00a693;box-shadow:0 0 7px #00a693;animation:blink 2.4s infinite"></span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:#6a7386">SKIIN G2 · LIVE · SYNCED 4M AGO</span>
+    </div>
+    <div style="background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid #e5e9f0;border-radius:18px;box-shadow:0 12px 28px rgba(16,24,40,.06);padding:16px;margin-bottom:16px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#00a693;margin-bottom:8px">DARWIN · TODAY'S READ</div>
+      <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:15px;line-height:1.55;color:#3c4557">{{ horseSynth }}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ sensorCards }}" as="s" hint-placeholder-count="5">
+        <button onClick="{{ s.tap }}" style="text-align:left;background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid {{ s.border }};border-radius:18px;box-shadow:0 12px 28px rgba(16,24,40,.06);padding:14px 16px;cursor:pointer;color:#1c2434;transition:border-color .18s,transform .18s" style-hover="border-color:#b3bdcf;transform:translateY(-1px)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6a7386">{{ s.label }}</span>
+            <span style="width:8px;height:8px;border-radius:50%;background:{{ s.color }};box-shadow:0 0 8px {{ s.color }}"></span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:5px">
+            <span style="font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:400;color:{{ s.color }}">{{ s.metric }}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8a93a6">{{ s.unit }}</span>
+          </div>
+          <div style="font-size:13px;line-height:1.45;color:#525c70">{{ s.insight }}</div>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ======================== ASKDARWIN ======================== -->
+  <sc-if value="{{ isDarwin }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #e9edf3">
+      <div style="display:flex;align-items:center;gap:9px">
+        <svg width="18" height="18" viewBox="0 0 20 20"><path d="M10 2 L12 8 L18 10 L12 12 L10 18 L8 12 L2 10 L8 8 Z" fill="#00a693"></path></svg>
+        <span style="font-family:'Fraunces',Georgia,serif;font-size:21px">AskDarwin</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:#8a93a6;margin-top:4px">REASONING ACROSS 5 SENSORS · 9 HORSES</div>
+    </div>
+    <div ref="{{ chatRef }}" style="flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px">
+      <sc-for list="{{ messages }}" as="m" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column">
+          <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+            <div style="align-self:flex-end;max-width:82%;background:#eef1f5;border:1px solid #dde3ec;border-radius:16px 16px 4px 16px;padding:10px 14px;font-size:14px;line-height:1.45">{{ m.text }}</div>
+          </sc-if>
+          <sc-if value="{{ m.isDarwin }}" hint-placeholder-val="{{ true }}">
+            <div style="align-self:flex-start;max-width:92%;animation:fadeUp .4s ease both">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;color:#00a693;margin-bottom:5px">DARWIN</div>
+              <sc-if value="{{ m.lead }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:16px;line-height:1.5;color:#4a4430;margin-bottom:8px">{{ m.lead }}</div>
+              </sc-if>
+              <div style="font-size:14px;line-height:1.55;color:#3c4557;white-space:pre-line">{{ m.text }}</div>
+              <sc-if value="{{ m.callout }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:12px;background:#f4f6f9;border:1px solid #e5e9f0;border-radius:16px;padding:14px">
+                  <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+                    <span style="background:rgba(217,141,16,.08);border:1px solid rgba(217,141,16,.4);color:#d98d10;border-radius:999px;padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.05em">RESP · R1 RATE ↑</span>
+                    <span style="background:rgba(217,141,16,.08);border:1px solid rgba(217,141,16,.4);color:#d98d10;border-radius:999px;padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.05em">TEMP · SLOW RETURN</span>
+                    <span style="background:rgba(217,141,16,.08);border:1px solid rgba(217,141,16,.4);color:#d98d10;border-radius:999px;padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.05em">GAIT · ASYM 93</span>
+                  </div>
+                  <div style="text-align:center;color:#aab3c2;margin:8px 0;font-size:14px">↓</div>
+                  <div style="text-align:center;background:rgba(0,166,147,.07);border:1px solid rgba(0,166,147,.4);border-radius:999px;padding:7px 12px;color:#00a693;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;box-shadow:0 0 16px rgba(0,166,147,.12)">ONE PATTERN · CAUGHT EARLY</div>
+                  <div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;color:#8a93a6;margin-top:9px">RULED OUT: ECG CLEAN · ENVIRONMENT UNREMARKABLE</div>
+                  <div style="text-align:center;font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:13.5px;color:#6a7386;margin-top:9px">No single sensor could see this. Five, reasoning together, did.</div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+
+      <sc-if value="{{ showActions }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:9px;animation:fadeUp .5s ease both">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;color:#8a93a6">RECOMMENDED NEXT STEPS</div>
+          <button onClick="{{ openBooking }}" style="text-align:left;display:flex;align-items:center;justify-content:space-between;background:rgba(0,166,147,.07);border:1px solid rgba(0,166,147,.45);border-radius:14px;padding:13px 15px;color:#00a693;font-size:14px;font-weight:600;cursor:pointer">
+            <span>{{ bookLabel }}</span><span style="opacity:.7">{{ bookArrow }}</span>
+          </button>
+          <div style="background:linear-gradient(180deg,#f4f2fe,#ece9fb);border:1px solid rgba(111,92,224,.35);border-radius:14px;padding:14px 15px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;color:#6f5ce0;margin-bottom:7px">CONTINUITY OF CARE · MYANT</div>
+            <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:14px;line-height:1.5;color:#4a3fa8;margin-bottom:9px">"To catch this earlier next time, I'd watch Comet's breathing continuously, not just during works."</div>
+            <div style="font-size:13.5px;font-weight:600;margin-bottom:2px">SKIIN Respiratory+ add-on</div>
+            <div style="font-size:12px;color:#6a7386;margin-bottom:10px">Continuous respiratory monitoring between works · $49/mo per horse · included in Myant Pro</div>
+            <button onClick="{{ addUpsell }}" style="width:100%;background:{{ upsellBg }};border:1px solid rgba(111,92,224,.5);border-radius:11px;padding:10px;color:{{ upsellColor }};font-size:13px;font-weight:600;cursor:pointer">{{ upsellLabel }}</button>
+          </div>
+          <button onClick="{{ setReduced }}" style="text-align:left;background:#ffffff;border:1px solid {{ reducedBorder }};border-radius:14px;padding:13px 15px;color:{{ reducedColor }};font-size:14px;font-weight:600;cursor:pointer">{{ reducedLabel }}</button>
+        </div>
+      </sc-if>
+    </div>
+    <div style="padding:10px 18px 12px;border-top:1px solid #e9edf3">
+      <div style="display:flex;gap:7px;overflow-x:auto;margin-bottom:10px;padding-bottom:2px">
+        <sc-for list="{{ suggestions }}" as="q" hint-placeholder-count="2">
+          <button onClick="{{ q.tap }}" style="flex:0 0 auto;background:#ffffff;border:1px solid #dde3ec;border-radius:999px;padding:7px 13px;color:#525c70;font-size:12.5px;cursor:pointer">{{ q.text }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input ref="{{ inputRef }}" placeholder="Ask Darwin about the string…" style="flex:1;background:#ffffff;border:1px solid #dde3ec;border-radius:999px;padding:11px 16px;color:#1c2434;font-family:'Inter Tight',sans-serif;font-size:14px;outline:none">
+        <button onClick="{{ sendTyped }}" style="width:40px;height:40px;border-radius:50%;background:#00a693;border:none;color:#f6f7f9;font-size:16px;cursor:pointer;font-weight:700">↑</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ======================== SENSORS ======================== -->
+  <sc-if value="{{ isSensors }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;overflow-y:auto;padding:14px 18px 24px">
+    <div style="font-family:'Fraunces',Georgia,serif;font-size:26px;margin-bottom:2px">Sensors</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8a93a6;margin-bottom:16px">SKIIN GEN 2 · 5 MODALITIES · FEATURED: COMET</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <sc-for list="{{ sensorList }}" as="s" hint-placeholder-count="5">
+        <button onClick="{{ s.tap }}" style="grid-column:{{ s.span }};text-align:left;background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid {{ s.border }};border-radius:18px;box-shadow:0 12px 28px rgba(16,24,40,.06);padding:14px;cursor:pointer;color:#1c2434;transition:border-color .18s,transform .18s" style-hover="border-color:#b3bdcf;transform:translateY(-1px)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:#6a7386">{{ s.label }}</span>
+            <span style="width:7px;height:7px;border-radius:50%;background:{{ s.color }};box-shadow:0 0 7px {{ s.color }}"></span>
+          </div>
+          <div style="font-family:'Fraunces',Georgia,serif;font-size:20px;color:{{ s.color }};margin-bottom:4px">{{ s.metric }}</div>
+          <div style="font-size:12px;color:#6a7386;line-height:1.4">{{ s.sub }}</div>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ======================== TRENDS ======================== -->
+  <sc-if value="{{ isTrends }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;overflow-y:auto;padding:14px 18px 24px">
+    <div style="font-family:'Fraunces',Georgia,serif;font-size:26px;margin-bottom:2px">Trends</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8a93a6;margin-bottom:14px">COMET · LAST 6 WEEKS</div>
+    <div style="background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid #e5e9f0;border-radius:18px;box-shadow:0 12px 28px rgba(16,24,40,.06);padding:16px;margin-bottom:14px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6a7386">READINESS INDEX</span>
+        <span style="font-family:'Fraunces',Georgia,serif;font-size:34px;color:{{ vitColor }}">{{ vitScore }}</span>
+      </div>
+      <svg viewBox="0 0 300 64" style="width:100%;height:64px;display:block">
+        <polyline points="{{ readinessMain }}" fill="none" stroke="#00a693" stroke-width="2" stroke-linecap="round" opacity="0.9"></polyline>
+        <polyline points="{{ readinessTail }}" fill="none" stroke="{{ tailColor }}" stroke-width="2" stroke-linecap="round"></polyline>
+        <circle cx="{{ lastX }}" cy="{{ lastY }}" r="3.5" fill="{{ tailColor }}"></circle>
+      </svg>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;color:#aab3c2;display:flex;justify-content:space-between;margin-top:6px"><span>JUN 03</span><span>JUL 15</span></div>
+    </div>
+    <div style="background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid #e5e9f0;border-radius:18px;box-shadow:0 12px 28px rgba(16,24,40,.06);padding:16px;margin-bottom:14px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#00a693;margin-bottom:8px">DARWIN · THE LONG READ</div>
+      <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:14.5px;line-height:1.55;color:#3c4557">{{ quarterlyRead }}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ trendRows }}" as="t" hint-placeholder-count="3">
+        <div style="background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid #e5e9f0;border-radius:16px;box-shadow:0 10px 24px rgba(16,24,40,.06);padding:12px 14px;display:flex;align-items:center;gap:12px">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;margin-bottom:2px">{{ t.label }}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:{{ t.deltaColor }}">{{ t.delta }}</div>
+          </div>
+          <svg viewBox="0 0 90 28" style="width:90px;height:28px"><polyline points="{{ t.pts }}" fill="none" stroke="{{ t.deltaColor }}" stroke-width="1.6" stroke-linecap="round"></polyline></svg>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ======================== SENSOR DETAIL OVERLAY ======================== -->
+  <sc-if value="{{ sensorOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:#f6f7f9;z-index:30;display:flex;flex-direction:column;animation:fadeUp .25s ease both;padding-top:58px">
+    <div style="padding:14px 18px 10px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #e9edf3">
+      <button onClick="{{ closeSensor }}" style="background:#ffffff;border:1px solid #dde3ec;border-radius:999px;width:34px;height:34px;color:#525c70;cursor:pointer;font-size:15px">←</button>
+      <div>
+        <div style="font-family:'Fraunces',Georgia,serif;font-size:19px">{{ detTitle }}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;color:#8a93a6">COMET · SKIIN G2 · LIVE</div>
+      </div>
+      <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:#ffffff;border:1px solid #e5e9f0;border-radius:999px;padding:5px 11px">
+        <span style="width:7px;height:7px;border-radius:50%;background:{{ detColor }};box-shadow:0 0 7px {{ detColor }}"></span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;color:{{ detColor }}">{{ detStatus }}</span>
+      </span>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px 18px 24px">
+      <div style="font-family:'Fraunces',Georgia,serif;font-size:30px;color:{{ detColor }};margin-bottom:14px">{{ detHeadline }}</div>
+      <div style="background:#f4f6f9;border:1px solid #e5e9f0;border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;color:#8a93a6;margin-bottom:10px">{{ detTraceLabel }}</div>
+        <svg viewBox="0 0 320 60" style="width:100%;height:70px;display:block">
+          <polyline points="{{ detTrace }}" fill="none" stroke="{{ detColor }}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        </svg>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6a7386;margin-bottom:8px">BY PHASE · TODAY</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <sc-for list="{{ detPhases }}" as="p" hint-placeholder-count="5">
+          <div style="flex:1;background:#ffffff;border:1px solid {{ p.border }};border-radius:12px;padding:9px 4px;text-align:center">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.08em;color:#8a93a6;margin-bottom:4px">{{ p.label }}</div>
+            <div style="font-size:13px;font-weight:600;color:{{ p.color }}">{{ p.value }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid #e5e9f0;border-radius:18px;box-shadow:0 12px 28px rgba(16,24,40,.06);padding:16px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#00a693;margin-bottom:8px">DARWIN</div>
+        <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:14.5px;line-height:1.55;color:#3c4557">{{ detCommentary }}</div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ======================== BOOKING SHEET ======================== -->
+  <sc-if value="{{ bookingOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:40">
+    <div onClick="{{ closeBooking }}" style="position:absolute;inset:0;background:rgba(15,23,42,.42);animation:scrimIn .25s ease both"></div>
+    <div style="position:absolute;left:0;right:0;bottom:0;background:#ffffff;border:1px solid #dde3ec;border-bottom:none;border-radius:22px 22px 0 0;padding:18px 18px 26px;animation:sheetIn .35s cubic-bezier(.2,.9,.3,1) both">
+      <div style="width:36px;height:4px;border-radius:2px;background:#dde3ec;margin:0 auto 16px"></div>
+      <sc-if value="{{ bookingStep1 }}" hint-placeholder-val="{{ true }}">
+        <div style="font-family:'Fraunces',Georgia,serif;font-size:20px;margin-bottom:2px">Book a vet exam</div>
+        <div style="font-size:12.5px;color:#6a7386;margin-bottom:14px">Comet · Darwin will attach the signal summary</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+          <sc-for list="{{ vets }}" as="v" hint-placeholder-count="3">
+            <button onClick="{{ v.tap }}" style="display:flex;align-items:center;justify-content:space-between;background:{{ v.bg }};border:1px solid {{ v.border }};border-radius:13px;padding:12px 14px;color:#1c2434;cursor:pointer;text-align:left">
+              <span><span style="font-size:14px;font-weight:600">{{ v.name }}</span><span style="display:block;font-size:11.5px;color:#6a7386;margin-top:1px">{{ v.cred }}</span></span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:{{ v.check }}">✓</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <sc-for list="{{ slots }}" as="sl" hint-placeholder-count="3">
+            <button onClick="{{ sl.tap }}" style="flex:1;background:{{ sl.bg }};border:1px solid {{ sl.border }};border-radius:11px;padding:10px 4px;color:{{ sl.color }};font-family:'JetBrains Mono',monospace;font-size:10.5px;cursor:pointer">{{ sl.label }}</button>
+          </sc-for>
+        </div>
+        <button onClick="{{ toConfirm }}" style="width:100%;background:{{ continueBg }};border:none;border-radius:13px;padding:14px;color:#f6f7f9;font-size:14.5px;font-weight:700;cursor:pointer">Continue</button>
+      </sc-if>
+      <sc-if value="{{ bookingStep2 }}" hint-placeholder-val="{{ false }}">
+        <div style="font-family:'Fraunces',Georgia,serif;font-size:20px;margin-bottom:14px">Confirm booking</div>
+        <div style="background:#f4f6f9;border:1px solid #e5e9f0;border-radius:14px;padding:14px;margin-bottom:16px">
+          <div style="font-size:14.5px;font-weight:600;margin-bottom:3px">{{ chosenVet }} · {{ chosenSlot }}</div>
+          <div style="font-size:12.5px;color:#6a7386;line-height:1.5">Exam for Comet at the yard. Darwin will share the 4-day cross-sensor summary: respiratory recovery, temp kinetics, gait symmetry, with ECG and environmental context.</div>
+        </div>
+        <button onClick="{{ confirmBooking }}" style="width:100%;background:#00a693;border:none;border-radius:13px;padding:14px;color:#f6f7f9;font-size:14.5px;font-weight:700;cursor:pointer">Confirm booking</button>
+      </sc-if>
+      <sc-if value="{{ bookingStep3 }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:8px 0 4px">
+          <div style="width:54px;height:54px;border-radius:50%;background:rgba(31,169,107,.1);border:1px solid rgba(31,169,107,.5);display:grid;place-items:center;margin:0 auto 12px;color:#1fa96b;font-size:22px;box-shadow:0 0 24px rgba(31,169,107,.18)">✓</div>
+          <div style="font-family:'Fraunces',Georgia,serif;font-size:20px;margin-bottom:4px">Booked</div>
+          <div style="font-size:13.5px;color:#525c70;margin-bottom:2px">{{ chosenVet }} · {{ chosenSlot }}</div>
+          <div style="font-size:12.5px;color:#6a7386;margin-bottom:18px">Darwin will share the signal summary before the visit.</div>
+          <button onClick="{{ closeBooking }}" style="width:100%;background:#eef1f5;border:1px solid #dde3ec;border-radius:13px;padding:13px;color:#1c2434;font-size:14px;font-weight:600;cursor:pointer">Done</button>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ======================== TAB BAR ======================== -->
+  <sc-if value="{{ notSplash }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;border-top:1px solid #e5e9f0;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);padding:9px 6px 7px">
+    <button onClick="{{ goToday }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:{{ cToday }};padding:4px 0">
+      <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"></circle><circle cx="10" cy="10" r="2" fill="currentColor"></circle></svg>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.08em">TODAY</span>
+    </button>
+    <button onClick="{{ goHorse }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:{{ cHorse }};padding:4px 0">
+      <svg width="20" height="20" viewBox="0 0 20 20"><path d="M5 16 V9 a5 5 0 0 1 10 0 V16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path><circle cx="5" cy="16.5" r="1.2" fill="currentColor"></circle><circle cx="15" cy="16.5" r="1.2" fill="currentColor"></circle></svg>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.08em">HORSE</span>
+    </button>
+    <button onClick="{{ goDarwin }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:{{ cDarwin }};padding:4px 0">
+      <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2.5 L11.8 8.2 L17.5 10 L11.8 11.8 L10 17.5 L8.2 11.8 L2.5 10 L8.2 8.2 Z" fill="currentColor"></path></svg>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.08em">DARWIN</span>
+    </button>
+    <button onClick="{{ goSensors }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:{{ cSensors }};padding:4px 0">
+      <svg width="20" height="20" viewBox="0 0 20 20"><polyline points="2,10 6.5,10 8.5,4.5 11.5,15.5 13.5,10 18,10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.08em">SENSORS</span>
+    </button>
+    <button onClick="{{ goTrends }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:{{ cTrends }};padding:4px 0">
+      <svg width="20" height="20" viewBox="0 0 20 20"><polyline points="3,15.5 8,10 11.5,12.5 17,5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.08em">TRENDS</span>
+    </button>
+  </div>
+  </sc-if>
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;470&quot;,&quot;height&quot;:&quot;960&quot;},&quot;autoAlert&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Demo flow&quot;},&quot;alertDelaySeconds&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:6,&quot;min&quot;:2,&quot;max&quot;:30,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Demo flow&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.inputRef = React.createRef();
+    this.chatRef = React.createRef();
+    this.videoInputRef = React.createRef();
+    this.videoElRef = React.createRef();
+    this.state = { ...this.initialState(), videoUrl: null };
+    this.traces = this.buildTraces();
+  }
+  initialState() {
+    return {
+      splash: true, tab: 'today', alertFired: false, syncing: false, horseId: 'comet',
+      messages: [{ who: 'darwin', text: "Morning, Ms. Hale. The string synced overnight and reads quiet. Ask me anything, or tap a question below." }],
+      chatMode: 'idle', showActions: false, asked: {},
+      sensorId: null, bookingOpen: false, bookingStep: 1, vetIdx: 0, slotIdx: 0,
+      booked: false, upsellAdded: false, reducedWork: false
+    };
+  }
+  componentDidMount() {
+    try {
+      const r = indexedDB.open('myant-demo', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('kv');
+      r.onsuccess = () => {
+        const q = r.result.transaction('kv').objectStore('kv').get('splash-video');
+        q.onsuccess = () => { if (q.result) this.setState({ videoUrl: URL.createObjectURL(q.result) }); };
+      };
+    } catch (e) {}
+  }
+  enterApp() {
+    this.setState({ splash: false });
+    if (this.props.autoAlert && !this.state.alertFired) {
+      this._t = setTimeout(() => this.fireAlert(), (this.props.alertDelaySeconds ?? 6) * 1000);
+    }
+  }
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._t2); }
+  componentDidUpdate(pp, ps) {
+    const el = this.chatRef.current;
+    if (el && (ps.messages !== this.state.messages || ps.showActions !== this.state.showActions)) el.scrollTop = el.scrollHeight;
+    const v = this.videoElRef.current;
+    if (v && v.paused) { v.muted = true; v.play().catch(() => {}); }
+  }
+  fireAlert() { this.setState({ alertFired: true, syncing: false }); }
+  buildTraces() {
+    const ecg = [];
+    for (let x = 0; x <= 320; x += 2) {
+      const ph = x % 64; let y = 32;
+      if (ph === 20 || ph === 24) y = 28; if (ph === 22) y = 27;
+      if (ph === 34) y = 36; if (ph === 36) y = 6; if (ph === 38) y = 50; if (ph === 40) y = 32;
+      if (ph === 50 || ph === 54) y = 26; if (ph === 52) y = 24;
+      ecg.push(x + ',' + y);
+    }
+    const wave = (fn) => { const p = []; for (let x = 0; x <= 320; x += 8) p.push(x + ',' + fn(x).toFixed(1)); return p.join(' '); };
+    return {
+      ecg: ecg.join(' '),
+      resp: wave(x => 44 - x * 0.075 + Math.sin(x / 18) * 4),
+      temp: wave(x => 12 + 38 * Math.exp(-x / 260) + Math.sin(x / 30) * 1.5),
+      bio: wave(x => 22 + x * 0.04 + Math.sin(x / 14) * 5),
+      env: wave(x => 30 + Math.sin(x / 40) * 3)
+    };
+  }
+  horsesData() {
+    return [
+      { id: 'comet', name: 'Comet', breed: 'Thoroughbred', sex: 'Gelding', age: 5, vit: 91, hr: 34 },
+      { id: 'aurora', name: 'Aurora Bay', breed: 'Thoroughbred', sex: 'Filly', age: 3, vit: 94, hr: 36 },
+      { id: 'northline', name: 'Northline', breed: 'Standardbred', sex: 'Gelding', age: 6, vit: 89, hr: 33 },
+      { id: 'delta', name: 'Delta Sky', breed: 'Thoroughbred', sex: 'Mare', age: 7, vit: 90, hr: 35 },
+      { id: 'marlowe', name: 'Marlowe', breed: 'Standardbred', sex: 'Colt', age: 4, vit: 92, hr: 38 },
+      { id: 'ironwood', name: 'Ironwood', breed: 'Thoroughbred', sex: 'Gelding', age: 8, vit: 87, hr: 32 },
+      { id: 'quickstep', name: 'Quickstep', breed: 'Thoroughbred', sex: 'Filly', age: 4, vit: 93, hr: 37 },
+      { id: 'sable', name: 'Sable Point', breed: 'Standardbred', sex: 'Mare', age: 6, vit: 88, hr: 34 },
+      { id: 'vesper', name: 'Vesper', breed: 'Thoroughbred', sex: 'Colt', age: 3, vit: 95, hr: 39 }
+    ];
+  }
+  sensorDefs(flagged, h) {
+    const T = this.traces;
+    return [
+      { id: 'ecg', label: 'ECG · CARDIAC', metric: h.hr + ' bpm', unit: 'RESTING HR', color: '#1fa96b', status: 'NORMAL SINUS · CLEAN',
+        insight: flagged ? "Normal sinus rhythm, clean in every phase. The heart isn't the source." : 'Normal sinus rhythm; recovery kinetics on baseline.',
+        headline: 'Normal sinus rhythm', trace: T.ecg, traceLabel: 'SINGLE-LEAD TRACE · REST',
+        phases: [['REST', h.hr], ['SME', 128], ['ME', 214], ['R1', 96], ['R2', 58]].map(p => ({ label: p[0], value: p[1] + '', flag: false })),
+        commentary: "Rhythm is clean in every phase and recovery heart-rate kinetics match the 30-day baseline. Whatever is going on, the heart isn't the source, and that itself is informative." },
+      { id: 'bio', label: 'BIOMECHANICS · GAIT', metric: flagged ? '93' : '97', unit: 'SYMMETRY SCORE', color: flagged ? '#d98d10' : '#1fa96b',
+        status: flagged ? 'MILD ASYMMETRY' : 'EVEN · BALANCED',
+        insight: flagged ? 'Slight left-hind asymmetry emerging, down from a baseline of 97.' : 'Gait even at all phases; limb loading balanced.',
+        headline: flagged ? 'Symmetry 93 · drifting' : 'Symmetry 97 · even', trace: T.bio, traceLabel: 'LEFT-RIGHT LOAD DIFFERENTIAL · 4 DAYS',
+        phases: [['REST', '·'], ['SME', flagged ? 95 : 97], ['ME', flagged ? 93 : 97], ['R1', flagged ? 94 : 98], ['R2', '·']].map((p, i) => ({ label: p[0], value: p[1] + '', flag: flagged && (i === 1 || i === 2 || i === 3) })),
+        commentary: flagged ? 'A mild left-hind asymmetry has emerged over 4 days, most visible at ME. Down from a 30-day baseline of 97. Worth a soundness check alongside the respiratory picture.' : 'Stride length, cadence and limb loading are all inside baseline. Nothing to note.' },
+      { id: 'resp', label: 'RESPIRATORY', metric: flagged ? '41 brpm' : '26 brpm', unit: 'AT R1', color: flagged ? '#d98d10' : '#1fa96b',
+        status: flagged ? 'RECOVERY RATE ↑' : 'RECOVERY NORMAL',
+        insight: flagged ? 'Recovery rate after work creeping up: 28 to 41 over four sessions.' : 'Rate, effort and recovery all on baseline.',
+        headline: flagged ? '41 brpm at R1 · creeping' : '26 brpm at R1', trace: T.resp, traceLabel: 'R1 RECOVERY RATE · 4 SESSIONS',
+        phases: [['REST', 12], ['SME', 44], ['ME', 88], ['R1', flagged ? 41 : 26], ['R2', flagged ? 24 : 16]].map((p, i) => ({ label: p[0], value: p[1] + '', flag: flagged && i >= 3 })),
+        commentary: flagged ? 'Recovery rate at R1 has crept from 28 to 41 breaths per minute over four sessions while work intensity held steady. Effort during ME remains normal; it is the return to rest that is slowing.' : 'Respiratory rate, effort and recovery are all tracking baseline across phases.' },
+      { id: 'temp', label: 'BODY TEMP', metric: flagged ? '+9 min' : 'On time', unit: 'RETURN TO BASELINE', color: flagged ? '#d98d10' : '#1fa96b',
+        status: flagged ? 'SLOW RETURN' : 'ON BASELINE',
+        insight: flagged ? 'Core temp returning to baseline 9 minutes slower than usual.' : 'Core temp and heat load tracking baseline.',
+        headline: flagged ? 'Baseline +9 min · slowing' : 'Baseline return on time', trace: T.temp, traceLabel: 'CORE TEMP DECAY POST-ME',
+        phases: [['REST', '37.6°'], ['SME', '38.4°'], ['ME', '39.4°'], ['R1', flagged ? '39.0°' : '38.6°'], ['R2', flagged ? '38.4°' : '37.9°']].map((p, i) => ({ label: p[0], value: p[1], flag: flagged && i >= 3 })),
+        commentary: flagged ? 'Core temp is peaking normally during ME but returning to baseline 9 minutes slower than his 30-day average. In moderate ambient conditions, that points inward, not at the weather.' : 'Peak heat load and decay after work are both inside the usual envelope.' },
+      { id: 'env', label: 'ENVIRONMENTAL', metric: '21°C · 48%', unit: 'AMBIENT · RH', color: '#1fa96b', status: 'UNREMARKABLE',
+        insight: flagged ? 'Conditions moderate across all four sessions. Heat is ruled out.' : 'Ambient heat and humidity moderate; exposure normal.',
+        headline: '21°C · 48% RH · moderate', trace: T.env, traceLabel: 'AMBIENT HEAT INDEX · 4 DAYS',
+        phases: [['REST', '20°'], ['SME', '21°'], ['ME', '22°'], ['R1', '21°'], ['R2', '21°']].map(p => ({ label: p[0], value: p[1], flag: false })),
+        commentary: flagged ? 'Ambient conditions were moderate across the last four sessions. Nothing here explains the respiratory or temp drift, which is exactly why the pattern matters.' : 'Heat, humidity and exposure context are all unremarkable.' }
+    ];
+  }
+  catchMessages() {
+    return [
+      { who: 'user', text: 'What did you find on Comet?' },
+      { who: 'darwin',
+        lead: "I've connected three signals across sensors on Comet. Individually they're within range. Together they're a pattern worth catching early.",
+        text: "Over the last 4 days: his recovery respiratory rate after work crept from 28 to 41 breaths per minute at R1; core temp is taking 9 minutes longer to return to baseline after ME; and a mild left-hind asymmetry has emerged, symmetry down from 97 to 93.\nAmbient conditions were unremarkable across all four sessions, so this isn't heat. His ECG is clean, normal sinus rhythm throughout, so the heart isn't the source.\nTogether, the pattern points to a possible early respiratory infection or a developing musculoskeletal strain, before it would show clinically. I'd recommend a vet assess Comet before his next hard work.",
+        callout: true }
+    ];
+  }
+  cannedReplies() {
+    return {
+      heat: { q: 'Could this be heat stress?', a: "Unlikely. Ambient heat and humidity were moderate across all four sessions, and Comet's heat load during ME stayed inside his usual envelope. If heat were driving this, I'd expect the environmental and temp signals to move together. They didn't." },
+      clinical: { q: 'When would this have shown clinically?', a: "Patterns like this typically surface as an obvious cough, heat in a limb, or visible lameness 3 to 7 days after the signals begin to drift. We're seeing it at the drift stage, which is the point of watching five systems at once." },
+      string: { q: 'How is the string trending?', a: 'Steady. Readiness across the nine is averaging 91, recovery kinetics improved through the spring block, and heat tolerance has held through the warm spell. Ironwood is the one I watch closest, his age shows in R2, but he is inside his own baseline.' },
+      recovery: { q: "Recovery summary for yesterday's works", a: 'Five horses worked yesterday. All five returned to baseline HR inside 11 minutes, respiratory recovery was clean, and no gait changes followed the work. A quiet day, the good kind.' }
+    };
+  }
+  ask(key) {
+    const c = this.cannedReplies()[key];
+    this.setState(s => ({ messages: [...s.messages, { who: 'user', text: c.q }], asked: { ...s.asked, [key]: true } }));
+    this._t2 = setTimeout(() => this.setState(s => ({ messages: [...s.messages, { who: 'darwin', text: c.a }] })), 650);
+  }
+  openCatch() {
+    this.setState({ tab: 'darwin', chatMode: 'catch', showActions: true, messages: this.catchMessages() });
+  }
+  renderVals() {
+    const st = this.state, teal = '#00a693', amber = '#d98d10', green = '#1fa96b', dim = '#8a93a6';
+    const horsesRaw = this.horsesData();
+    const cur = horsesRaw.find(h => h.id === st.horseId) || horsesRaw[0];
+    const flagged = st.alertFired && cur.id === 'comet';
+    const cometFlag = st.alertFired;
+    const defs = this.sensorDefs(flagged, cur);
+    const cometDefs = this.sensorDefs(cometFlag, horsesRaw[0]);
+    const go = t => () => this.setState({ tab: t, sensorId: null });
+    const tabC = t => st.tab === t ? teal : dim;
+    const border = c => c === green ? '#e5e9f0' : 'rgba(217,141,16,.4)';
+    const vets = ['Dr. Okonkwo', 'Dr. Reyes', 'Dr. Lindqvist'];
+    const creds = ['Equine internal medicine · 12 min away', 'Sports medicine · lameness', 'Cardiology · teleconsult available'];
+    const slotLabels = ['THU 9:00AM', 'THU 2:30PM', 'FRI 8:00AM'];
+    const det = defs.find(d => d.id === st.sensorId) || cometDefs.find(d => d.id === st.sensorId) || defs[0];
+    const sugg = [];
+    const C = this.cannedReplies();
+    if (st.chatMode === 'idle') {
+      if (st.alertFired) sugg.push({ text: 'What did you find on Comet?', tap: () => this.openCatch() });
+      ['string', 'recovery'].forEach(k => { if (!st.asked[k]) sugg.push({ text: C[k].q, tap: () => this.ask(k) }); });
+    } else {
+      ['heat', 'clinical', 'string'].forEach(k => { if (!st.asked[k]) sugg.push({ text: C[k].q, tap: () => this.ask(k) }); });
+    }
+    const readyPts = [[0, 18], [33, 16], [66, 20], [100, 15], [133, 17], [166, 14], [200, 16], [233, 15], [266, 22], [298, 30]];
+    const mainPts = readyPts.slice(0, 8), tailPts = readyPts.slice(7);
+    return {
+      isSplash: st.splash, notSplash: !st.splash, enterApp: () => this.enterApp(),
+      hasVideo: !!st.videoUrl, noVideo: !st.videoUrl, videoUrl: st.videoUrl,
+      videoInputRef: this.videoInputRef, videoElRef: this.videoElRef,
+      pickVideo: () => { const el = this.videoInputRef.current; if (el) el.click(); },
+      onVideoFile: (e) => {
+        const f = e.target.files && e.target.files[0]; if (!f) return;
+        try { const r = indexedDB.open('myant-demo', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => r.result.transaction('kv', 'readwrite').objectStore('kv').put(f, 'splash-video'); } catch (err) {}
+        this.setState({ videoUrl: URL.createObjectURL(f) });
+      },
+      vitDash: (flaggedScore() / 100 * 264).toFixed(0) + ' 264',
+      horseId: cur.id,
+      isToday: !st.splash && st.tab === 'today', isHorse: !st.splash && st.tab === 'horse', isDarwin: !st.splash && st.tab === 'darwin',
+      isSensors: !st.splash && st.tab === 'sensors', isTrends: !st.splash && st.tab === 'trends',
+      goToday: go('today'), goHorse: go('horse'), goDarwin: go('darwin'), goSensors: go('sensors'), goTrends: go('trends'),
+      cToday: tabC('today'), cHorse: tabC('horse'), cDarwin: tabC('darwin'), cSensors: tabC('sensors'), cTrends: tabC('trends'),
+      restart: () => { clearTimeout(this._t2); this.setState(this.initialState()); },
+      todayDate: 'WEDNESDAY · JULY 15 · MORNING SYNC',
+      alertFired: st.alertFired, showSync: !st.alertFired,
+      syncLabel: st.syncing ? 'Syncing SKIIN garments…' : 'Sync latest',
+      onSync: () => { if (st.syncing) return; this.setState({ syncing: true }); this._t = setTimeout(() => this.fireAlert(), 1900); },
+      openCatch: () => this.openCatch(),
+      stringLine: st.alertFired ? '9 horses · 1 flagged for review' : '9 horses · all systems nominal',
+      stringDot: st.alertFired ? amber : green,
+      morningRead: st.alertFired
+        ? 'The string worked well and slept better. Eight read quiet this morning; Comet is the one I want your eyes on, details in the flag above.'
+        : 'A quiet morning across the string. Every garment synced overnight, recovery from yesterday\u2019s works was clean, and nothing is asking for your attention. A good day to train.',
+      horses: horsesRaw.map(h => ({
+        id: h.id, name: h.name, initials: h.name.split(' ').map(w => w[0]).join('').slice(0, 2),
+        tag: (h.breed === 'Thoroughbred' ? 'TB' : 'SB') + ' · ' + h.sex.toUpperCase().slice(0, 4),
+        dot: st.alertFired && h.id === 'comet' ? amber : green,
+        tap: () => this.setState({ tab: 'horse', horseId: h.id })
+      })),
+      vitScore: flaggedScore(), vitColor: cometFlag ? amber : teal,
+      vitGlow: cometFlag ? 'rgba(217,141,16,.25)' : 'rgba(0,166,147,.25)',
+      vitDelta: cometFlag ? '−3 · diverging' : '+2 · steady',
+      horseChips: horsesRaw.map(h => ({
+        name: h.name, tap: () => this.setState({ horseId: h.id }),
+        bg: h.id === st.horseId ? 'rgba(0,166,147,.1)' : '#ffffff',
+        border: h.id === st.horseId ? 'rgba(0,166,147,.45)' : '#e5e9f0',
+        color: h.id === st.horseId ? teal : '#6a7386'
+      })),
+      horseName: cur.name, horseMeta: cur.breed + ' · ' + cur.sex + ' · ' + cur.age + ' yrs',
+      horseVit: flagged ? cur.vit - 3 : cur.vit, horseVitColor: flagged ? amber : teal,
+      horseSynth: flagged
+        ? "Comet's heart is clean and the environment is unremarkable. What has my attention is the combination: respiratory recovery creeping up after work, core temp returning to baseline more slowly, and a slight left-hind asymmetry. Each is within range alone; together they deserve a vet's eyes before his next hard work."
+        : cur.name + ' reads quiet today. All five systems are within baseline, recovery after the last work was clean, and nothing needs your attention.',
+      sensorCards: defs.map(d => ({ label: d.label, metric: d.metric, unit: d.unit, insight: d.insight, color: d.color, border: border(d.color), tap: () => this.setState({ sensorId: d.id }) })),
+      sensorList: cometDefs.map((d, i) => ({ label: d.label, metric: d.metric, sub: d.status + ' · ' + d.insight, color: d.color, border: border(d.color), span: i === 4 ? '1 / -1' : 'auto', tap: () => this.setState({ sensorId: d.id }) })),
+      sensorOpen: !!st.sensorId, closeSensor: () => this.setState({ sensorId: null }),
+      detTitle: det.label, detColor: det.color, detStatus: det.status, detHeadline: det.headline,
+      detTrace: det.trace, detTraceLabel: det.traceLabel, detCommentary: det.commentary,
+      detPhases: det.phases.map(p => ({ label: p.label, value: p.value, color: p.flag ? amber : '#1c2434', border: p.flag ? 'rgba(217,141,16,.4)' : '#e5e9f0' })),
+      messages: st.messages.map(m => ({ isUser: m.who === 'user', isDarwin: m.who === 'darwin', text: m.text, lead: m.lead || false, callout: !!m.callout })),
+      showActions: st.showActions, suggestions: sugg,
+      inputRef: this.inputRef, chatRef: this.chatRef,
+      sendTyped: () => {
+        const el = this.inputRef.current; const v = el && el.value.trim(); if (!v) return; el.value = '';
+        this.setState(s => ({ messages: [...s.messages, { who: 'user', text: v }] }));
+        this._t2 = setTimeout(() => this.setState(s => ({ messages: [...s.messages, { who: 'darwin', text: "Good question. In this live demo I'm working from a fixed dataset; try one of the suggested questions and I'll walk you through what I'm seeing." }] })), 650);
+      },
+      bookLabel: st.booked ? 'Booked · ' + vets[st.vetIdx] + ' · ' + titleCase(slotLabels[st.slotIdx]) : 'Book a vet exam',
+      bookArrow: st.booked ? '✓' : '→',
+      openBooking: () => this.setState({ bookingOpen: true, bookingStep: st.booked ? 3 : 1 }),
+      upsellAdded: st.upsellAdded,
+      upsellLabel: st.upsellAdded ? 'Added · continuous monitoring starts tonight ✓' : "Add to Comet's garment",
+      upsellBg: st.upsellAdded ? 'rgba(31,169,107,.1)' : 'rgba(111,92,224,.14)',
+      upsellColor: st.upsellAdded ? green : '#4a3fa8',
+      addUpsell: () => this.setState({ upsellAdded: true }),
+      reducedLabel: st.reducedWork ? 'Reduced work set · until vet review ✓' : 'Set Comet to reduced work until reviewed',
+      reducedColor: st.reducedWork ? green : '#525c70',
+      reducedBorder: st.reducedWork ? 'rgba(31,169,107,.4)' : '#dde3ec',
+      setReduced: () => this.setState({ reducedWork: true }),
+      bookingOpen: st.bookingOpen, bookingStep1: st.bookingStep === 1, bookingStep2: st.bookingStep === 2, bookingStep3: st.bookingStep === 3,
+      closeBooking: () => this.setState({ bookingOpen: false }),
+      vets: vets.map((v, i) => ({ name: v, cred: creds[i], tap: () => this.setState({ vetIdx: i }), bg: i === st.vetIdx ? 'rgba(0,166,147,.07)' : '#f4f6f9', border: i === st.vetIdx ? 'rgba(0,166,147,.45)' : '#e5e9f0', check: i === st.vetIdx ? teal : 'transparent' })),
+      slots: slotLabels.map((l, i) => ({ label: l, tap: () => this.setState({ slotIdx: i }), bg: i === st.slotIdx ? 'rgba(0,166,147,.07)' : '#f4f6f9', border: i === st.slotIdx ? 'rgba(0,166,147,.45)' : '#e5e9f0', color: i === st.slotIdx ? teal : '#6a7386' })),
+      continueBg: teal,
+      toConfirm: () => this.setState({ bookingStep: 2 }),
+      confirmBooking: () => this.setState({ bookingStep: 3, booked: true }),
+      chosenVet: vets[st.vetIdx], chosenSlot: titleCase(slotLabels[st.slotIdx]),
+      readinessMain: mainPts.map(p => p.join(',')).join(' '),
+      readinessTail: tailPts.map(p => p.join(',')).join(' '),
+      tailColor: cometFlag ? amber : teal, lastX: 298, lastY: 30,
+      quarterlyRead: "Comet's spring block built steadily: readiness held in the low 90s and recovery kinetics improved through May and June. The divergence began around July 11, small enough to miss day to day, visible in hindsight on every affected system. This is what early looks like.",
+      trendRows: [
+        { label: 'Respiratory recovery · R1', delta: cometFlag ? '28 → 41 BRPM · 4 DAYS' : 'STABLE · 26-29 BRPM', deltaColor: cometFlag ? amber : green, pts: cometFlag ? '0,18 15,17 30,19 45,16 60,18 75,12 82,8 90,4' : '0,16 15,15 30,17 45,14 60,16 75,15 90,14' },
+        { label: 'Gait symmetry', delta: cometFlag ? '97 → 93 · DRIFTING' : '97 · EVEN', deltaColor: cometFlag ? amber : green, pts: cometFlag ? '0,10 15,11 30,9 45,11 60,12 75,17 90,22' : '0,12 15,11 30,12 45,10 60,12 75,11 90,11' },
+        { label: 'Heat tolerance', delta: 'STABLE THROUGH WARM SPELL', deltaColor: green, pts: '0,14 15,13 30,15 45,13 60,14 75,13 90,14' }
+      ]
+    };
+    function flaggedScore() { return cometFlag ? 88 : 91; }
+    function titleCase(s) { return s === 'THU 9:00AM' ? 'Thursday 9:00am' : s === 'THU 2:30PM' ? 'Thursday 2:30pm' : 'Friday 8:00am'; }
+  }
+}
+</script>
+</body>
+</html>
