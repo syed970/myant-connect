@@ -39,7 +39,7 @@ a{color:#00a693;text-decoration:none}a:hover{color:#1fa96b}
       <sc-if value="{{ hasVideo }}" hint-placeholder-val="{{ false }}">
         <div style="position:relative;border-radius:20px;overflow:hidden;aspect-ratio:9/12;box-shadow:0 24px 60px rgba(16,24,40,.18),0 0 0 1px #e3e7ee">
           <video ref="{{ videoElRef }}" loop="{{ true }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000"></video>
-          <button onClick="{{ pickVideo }}" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,.85);border:1px solid #cfd7e2;border-radius:999px;color:#6a7386;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;padding:5px 10px;cursor:pointer">REPLACE</button>
+          
         </div>
       </sc-if>
       <sc-if value="{{ noVideo }}" hint-placeholder-val="{{ true }}">
