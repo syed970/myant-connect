@@ -91,7 +91,7 @@ a{color:#00a693;text-decoration:none}a:hover{color:#1fa96b}
         <button onClick="{{ h.tap }}" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(180deg,#ffffff,#fafbfc);border:1px solid #e5e9f0;border-radius:16px;box-shadow:0 10px 24px rgba(16,24,40,.06);padding:12px 14px;cursor:pointer;color:#1c2434;min-width:86px;transition:border-color .18s,transform .18s" style-hover="border-color:#b3bdcf;transform:translateY(-1px)">
           <div style="position:relative">
             <div style="width:46px;height:46px;border-radius:50%;overflow:hidden;border:1px solid #dbe1ea">
-              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="photo-{{ h.id }}" shape="circle" fit="cover" placeholder="{{ h.initials }}" hint-size="46px,46px" style="width:46px;height:46px;display:block"></x-import>
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="photo-{{ h.id }}" src="{{ h.photo }}" shape="circle" fit="cover" placeholder="{{ h.initials }}" hint-size="46px,46px" style="width:46px;height:46px;display:block"></x-import>
             </div>
             <span style="position:absolute;bottom:0;right:-1px;width:9px;height:9px;border-radius:50%;background:{{ h.dot }};border:2px solid #ffffff"></span>
           </div>
@@ -132,7 +132,7 @@ a{color:#00a693;text-decoration:none}a:hover{color:#1fa96b}
     </div>
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
       <div style="width:62px;height:62px;border-radius:50%;overflow:hidden;border:1px solid #dbe1ea;flex:0 0 auto">
-        <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="photo-{{ horseId }}" shape="circle" fit="cover" placeholder="photo" hint-size="62px,62px" style="width:62px;height:62px;display:block"></x-import>
+        <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="photo-{{ horseId }}" src="{{ horsePhoto }}" shape="circle" fit="cover" placeholder="photo" hint-size="62px,62px" style="width:62px;height:62px;display:block"></x-import>
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-family:'Fraunces',Georgia,serif;font-size:31px;font-weight:400;line-height:1.1">{{ horseName }}</div>
@@ -414,7 +414,7 @@ class Component extends DCLogic {
     this.chatRef = React.createRef();
     this.videoInputRef = React.createRef();
     this.videoElRef = React.createRef();
-    this.state = { ...this.initialState(), videoUrl: null };
+    this.state = { ...this.initialState(), videoUrl: 'assets/splash-video.mp4' };
     this.traces = this.buildTraces();
   }
 
@@ -472,14 +472,14 @@ class Component extends DCLogic {
   }
   horsesData() {
     return [
-      { id: 'comet', name: 'Comet', breed: 'Thoroughbred', sex: 'Gelding', age: 5, vit: 91, hr: 34 },
-      { id: 'aurora', name: 'Aurora Bay', breed: 'Thoroughbred', sex: 'Filly', age: 3, vit: 94, hr: 36 },
-      { id: 'northline', name: 'Northline', breed: 'Standardbred', sex: 'Gelding', age: 6, vit: 89, hr: 33 },
-      { id: 'delta', name: 'Delta Sky', breed: 'Thoroughbred', sex: 'Mare', age: 7, vit: 90, hr: 35 },
+      { id: 'comet', name: 'Comet', breed: 'Thoroughbred', sex: 'Gelding', age: 5, vit: 91, hr: 34, photo: 'assets/horse-comet.jpg' },
+      { id: 'aurora', name: 'Aurora Bay', breed: 'Thoroughbred', sex: 'Filly', age: 3, vit: 94, hr: 36, photo: 'assets/horse-aurora.jpg' },
+      { id: 'northline', name: 'Northline', breed: 'Standardbred', sex: 'Gelding', age: 6, vit: 89, hr: 33, photo: 'assets/horse-northline.jpg' },
+      { id: 'delta', name: 'Delta Sky', breed: 'Thoroughbred', sex: 'Mare', age: 7, vit: 90, hr: 35, photo: 'assets/horse-delta.jpg' },
       { id: 'marlowe', name: 'Marlowe', breed: 'Standardbred', sex: 'Colt', age: 4, vit: 92, hr: 38 },
-      { id: 'ironwood', name: 'Ironwood', breed: 'Thoroughbred', sex: 'Gelding', age: 8, vit: 87, hr: 32 },
+      { id: 'ironwood', name: 'Ironwood', breed: 'Thoroughbred', sex: 'Gelding', age: 8, vit: 87, hr: 32, photo: 'assets/horse-ironwood.jpg' },
       { id: 'quickstep', name: 'Quickstep', breed: 'Thoroughbred', sex: 'Filly', age: 4, vit: 93, hr: 37 },
-      { id: 'sable', name: 'Sable Point', breed: 'Standardbred', sex: 'Mare', age: 6, vit: 88, hr: 34 },
+      { id: 'sable', name: 'Sable Point', breed: 'Standardbred', sex: 'Mare', age: 6, vit: 88, hr: 34, photo: 'assets/horse-sable.jpg' },
       { id: 'vesper', name: 'Vesper', breed: 'Thoroughbred', sex: 'Colt', age: 3, vit: 95, hr: 39 }
     ];
   }
@@ -594,7 +594,7 @@ class Component extends DCLogic {
         ? 'The string worked well and slept better. Eight read quiet this morning; Comet is the one I want your eyes on, details in the flag above.'
         : 'A quiet morning across the string. Every garment synced overnight, recovery from yesterday\u2019s works was clean, and nothing is asking for your attention. A good day to train.',
       horses: horsesRaw.map(h => ({
-        id: h.id, name: h.name, initials: h.name.split(' ').map(w => w[0]).join('').slice(0, 2),
+        id: h.id, name: h.name, photo: h.photo || '', initials: h.name.split(' ').map(w => w[0]).join('').slice(0, 2),
         tag: (h.breed === 'Thoroughbred' ? 'TB' : 'SB') + ' · ' + h.sex.toUpperCase().slice(0, 4),
         dot: st.alertFired && h.id === 'comet' ? amber : green,
         tap: () => this.setState({ tab: 'horse', horseId: h.id })
@@ -608,7 +608,7 @@ class Component extends DCLogic {
         border: h.id === st.horseId ? 'rgba(0,166,147,.45)' : '#e5e9f0',
         color: h.id === st.horseId ? teal : '#6a7386'
       })),
-      horseName: cur.name, horseMeta: cur.breed + ' · ' + cur.sex + ' · ' + cur.age + ' yrs',
+      horsePhoto: cur.photo || '', horseName: cur.name, horseMeta: cur.breed + ' · ' + cur.sex + ' · ' + cur.age + ' yrs',
       horseVit: flagged ? cur.vit - 3 : cur.vit, horseVitColor: flagged ? amber : teal,
       horseSynth: flagged
         ? "Comet's heart is clean and the environment is unremarkable. What has my attention is the combination: respiratory recovery creeping up after work, core temp returning to baseline more slowly, and a slight left-hind asymmetry. Each is within range alone; together they deserve a vet's eyes before his next hard work."
